@@ -124,7 +124,7 @@ body::before {
   }
 
   .tag {
-    @apply text-xs font-semibold uppercase tracking-[0.3em] text-emerald-200;
+    @apply text-xs font-semibold uppercase tracking-[0.3em] text-emerald-500;
   }
 
   .bg-app {

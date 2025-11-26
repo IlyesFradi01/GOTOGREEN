@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 const heroStats = [
@@ -235,6 +236,15 @@ const socialLinks: SocialLink[] = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/gotoogreen/posts/?feedView=all", icon: LinkedInIcon },
 
 ];
+const emailJsConfig = {
+  serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
+  templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
+  publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "",
+};
+
+
+const defaultRecipientEmail = process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL ?? "info@pass2green.com";
+
 
 const quickLinks = [
   { label: "Home", href: "#home" },
@@ -365,7 +375,7 @@ export default function Home() {
                 <span
                   className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${group.accent}`}
                 />
-                <p className="text-xs font-semibold uppercase tracking-[0.4em] text-emerald-200">
+                <p className="text-sm font-semibold uppercase tracking-[0.4em] text-emerald-500">
                   {group.category}
                 </p>
                 <div className="mt-6 space-y-6">
@@ -450,11 +460,11 @@ export default function Home() {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.author}
-                className="glass-card testimonial-card h-full border border-emerald-200/15 p-6 shadow-[0_35px_60px_-15px_rgba(15,23,42,0.4)]"
+                className="glass-card testimonial-card h-full border border-emerald-500/15 p-6 shadow-[0_35px_60px_-15px_rgba(15,23,42,0.4)]"
               >
                 <div className="text-3xl text-emerald-300">“</div>
                 <p className="mt-2 text-lg text-soft">{testimonial.quote}</p>
-                <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-500">
                   {testimonial.author}
                 </p>
               </div>
@@ -493,13 +503,13 @@ export default function Home() {
               <div className="mt-6 space-y-3 text-muted">
                 <p>
                   Email:{" "}
-                  <a href="mailto:info@pass2green.com" className="text-emerald-300">
+                  <a href="mailto:info@pass2green.com" className="text-emerald-500">
                     info@pass2green.com
                   </a>
                 </p>
                 <p>
                   Phone:{" "}
-                  <a href="tel:+21652373375" className="text-emerald-300">
+                  <a href="tel:+21652373375" className="text-emerald-500">
                     +216 52 373 375
                   </a>
                 </p>
@@ -531,15 +541,42 @@ type ContactFormProps = {
 };
 
 function ContactForm({ formMessage, setFormMessage }: ContactFormProps) {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    event.currentTarget.reset();
-    setFormMessage("Thanks for reaching out. We'll respond within one business day.");
-    setTimeout(() => setFormMessage(null), 5000);
+    if (!formRef.current) return;
+
+    const formElement = formRef.current;
+
+    setFormError(null);
+
+    if (!emailJsConfig.serviceId || !emailJsConfig.templateId || !emailJsConfig.publicKey) {
+      setFormError("Email service is not configured yet. Please try again later.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await emailjs.sendForm(emailJsConfig.serviceId, emailJsConfig.templateId, formElement, {
+        publicKey: emailJsConfig.publicKey,
+      });
+      formElement.reset();
+      setFormMessage("Thanks for reaching out. We'll respond within one business day.");
+      setTimeout(() => setFormMessage(null), 5000);
+    } catch (error) {
+      console.error("EmailJS submission failed", error);
+      setFormError("Something went wrong while sending your message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass-card space-y-5 p-8">
+    <form ref={formRef} onSubmit={handleSubmit} className="glass-card space-y-5 p-8">
+      <input type="hidden" name="to_email" value={defaultRecipientEmail} />
       <h4 className="text-2xl font-semibold text-foreground">Tell us more about your project</h4>
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-muted">
@@ -591,9 +628,14 @@ function ContactForm({ formMessage, setFormMessage }: ContactFormProps) {
           placeholder="Is there anything else you want to mention ? "
         />
       </div>
-      <button type="submit" className="btn-primary w-full text-base font-semibold">
-        Submit →
+      <button type="submit" className="btn-primary w-full text-base font-semibold" disabled={isSubmitting}>
+        {isSubmitting ? "Sending..." : "Submit →"}
       </button>
+      {formError && (
+        <p className="text-sm font-medium text-red-400" role="alert">
+          {formError}
+        </p>
+      )}
       {formMessage && (
         <p className="text-sm font-medium text-emerald-300" role="status">
           {formMessage}
@@ -627,7 +669,7 @@ function SocialIconButton({ social }: { social: SocialLink }) {
   return (
     <a
       href={social.href}
-      className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-200/20 text-emerald-200 transition hover:border-emerald-300 hover:bg-emerald-300/10"
+      className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/20 text-emerald-500 transition hover:border-emerald-300 hover:bg-emerald-300/10"
       target="_blank"
       rel="noreferrer"
       aria-label={social.label}
@@ -646,7 +688,7 @@ function SocialLinksRow() {
           <a
             key={social.label}
             href={social.href}
-            className="flex items-center gap-2 hover:text-emerald-300"
+            className="flex items-center gap-2 hover:text-emerald-500"
             target="_blank"
             rel="noreferrer"
           >
@@ -685,7 +727,7 @@ function ScrollToTopButton() {
     <button
       type="button"
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-40 rounded-full border border-emerald-200/40 bg-panel/90 p-3 text-emerald-100 shadow-lg backdrop-blur transition hover:border-emerald-300 hover:text-emerald-300"
+      className="fixed bottom-6 right-6 z-40 rounded-full border border-emerald-500/40 bg-panel/90 p-3 text-emerald-100 shadow-lg backdrop-blur transition hover:border-emerald-500 hover:text-emerald-500 text-emerald-500 text-xl font-bold"
       aria-label="Scroll back to top"
     >
       ↑
@@ -712,7 +754,7 @@ function Footer({ theme }: FooterProps) {
             className="h-auto w-36 md:w-48"
           />
           <p className="font-semibold text-foreground">GoToGreen</p>
-          <p className="text-xs uppercase tracking-[0.4em] text-emerald-200">
+          <p className="text-xs uppercase tracking-[0.4em] text-emerald-500">
             Built responsibly with GoToGreen
           </p>
           <SocialLinksRow />
