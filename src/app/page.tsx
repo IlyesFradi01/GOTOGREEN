@@ -91,7 +91,7 @@ const serviceGroups = [
     accent: "from-emerald-400/70 to-lime-300/50",
     items: [
       {
-        title: "SEO & Geo Optimization",
+        title: "SEO & GEO Optimization",
         description: "Improve visibility and reach the right audience.",
       },
       {
@@ -514,7 +514,7 @@ export default function Home() {
                   </a>
                 </p>
                 <p>{contactInfo.address}</p>
-                <p>Social: LinkedIn </p>
+               
                 <div className="mt-6 flex gap-3">
                 {socialLinks.map((social) => (
                   <SocialIconButton key={social.label} social={social} />
