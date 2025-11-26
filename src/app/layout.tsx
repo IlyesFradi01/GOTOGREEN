@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: "/Group.png",
+  },
   title: "GoToGreen | Climate Intelligence Studio",
   description:
     "GoToGreen delivers an end-to-end climate intelligence platform that helps founders plan, finance, and scale green-tech infrastructure with confidence.",
