@@ -158,21 +158,44 @@ const keyDifferentiators = [
 
 
 
-const testimonials = [
+type Testimonial = {
+  id: string;
+  quote: string;
+  author: string;
+  role: string;
+  company?: string;
+  image?: string;
+  metric?: string;
+  metricLabel?: string;
+};
+
+const testimonials: Testimonial[] = [
   {
+    id: "soumaya-elkamel",
     quote:
-      "GoToGreen transformed our digital presence. Our site is faster, smarter, and visually stunning!",
-    author: "Ahmed Kahloun",
+      "Excellent technical expertise, great attention to detail, and truly pleasant collaboration. The project ran smoothly thanks to your professionalism. I look forward to future projects together.",
+    author: "Soumaya Elkamel",
+    role: "Manager",
+    company: "Fondasolution",
+    image: "/fondasolution%20logo.png",
   },
   {
+    id: "jihen-ben-jrad",
     quote:
-      "Innovative, professional, and eco-conscious. Highly recommend their team.",
-    author: "Nour El Houda Ben Salah",
+      "Your work on our GEO & AI Optimization project has been outstanding. High quality, responsive, and impactful. We value your partnership and look forward to the next phases.",
+    author: "Jihen Ben Jrad",
+    role: "Communication & Marketing Responsible",
+    company: "Amphenol Automotive",
+    image: "/Logo_Amphenol.png",
   },
   {
+    id: "rima-fathallah",
     quote:
-      "Exceptional service and attention to detail. They delivered beyond expectations.",
-    author: "Najib Othmani",
+      "Professional, efficient, and reliable. Your team delivered clear, structured, and high-quality results during the SDC Congress challenge. Excellent collaboration.",
+    author: "Rima Fathallah",
+    role: "Executive Member",
+    company: "IEEE SIGHT",
+    image: "/IEEE-SIGHT-.jpg",
   },
 ];
 
@@ -221,6 +244,17 @@ const MoonIcon = ({ className }: SocialIconProps) => (
     aria-hidden="true"
   >
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+  </svg>
+);
+
+const StarIcon = ({ className }: SocialIconProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="m12 3.25 2.59 5.25 5.91.86-4.25 4.14 1 5.86L12 16.98l-5.25 2.77 1-5.86-4.25-4.14 5.91-.86L12 3.25Z" />
   </svg>
 );
 
@@ -456,17 +490,62 @@ export default function Home() {
               Trusted by teams who value responsibility.
             </h3>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="mb-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((testimonial) => (
               <div
-                key={testimonial.author}
-                className="glass-card testimonial-card h-full border border-emerald-500/15 p-6 shadow-[0_35px_60px_-15px_rgba(15,23,42,0.4)]"
+                key={testimonial.id}
+                className="group flex flex-col rounded-[28px] border border-soft bg-panel p-8 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400/60 hover:shadow-[0_20px_35px_rgba(15,23,42,0.45)]"
               >
-                <div className="text-3xl text-emerald-300">“</div>
-                <p className="mt-2 text-lg text-soft">{testimonial.quote}</p>
-                <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-500">
-                  {testimonial.author}
+                <div className="mb-4 flex gap-1 text-emerald-300">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <StarIcon
+                      key={`${testimonial.id}-star-${index}`}
+                      className="h-4 w-4 opacity-80"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+                <p className="mb-6 flex-1 text-base leading-relaxed text-soft">
+                  “{testimonial.quote}”
                 </p>
+                {testimonial.metric && (
+                  <div className="mb-6 rounded-2xl border border-soft/60 bg-panel/60 p-4">
+                    <div className="text-2xl font-bold text-foreground">
+                      {testimonial.metric}
+                    </div>
+                    {testimonial.metricLabel && (
+                      <div className="text-xs text-muted">
+                        {testimonial.metricLabel}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="flex items-center gap-3 border-t border-soft/60 pt-4">
+                  {testimonial.image && (
+                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-soft bg-panel">
+                      <Image
+                        src={testimonial.image}
+                        alt={testimonial.author}
+                        fill
+                        sizes="48px"
+                        className="object-contain p-1"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground">
+                      {testimonial.author}
+                    </p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted">
+                      {testimonial.role}
+                    </p>
+                    {testimonial.company && (
+                      <p className="text-xs font-medium text-emerald-400">
+                        {testimonial.company}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
