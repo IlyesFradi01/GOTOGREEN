@@ -277,7 +277,7 @@ const emailJsConfig = {
 };
 
 
-const defaultRecipientEmail = process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL ?? "contact@gotoogreen.com";
+const defaultRecipientEmail = process.env.NEXT_PUBLIC_EMAILJS_TO_EMAIL ?? "contact@gotoogreen.tn";
 
 
 const quickLinks = [
@@ -288,7 +288,7 @@ const quickLinks = [
 ];
 
 const contactInfo = {
-  email: "contact@gotoogreen.com",
+  email: "contact@gotoogreen.tn",
   phone: "+216 52 373 375",
   address: "Immeuble Alya Médicale, rue des Olivier · 4001 Khzema, Sousse",
 };
@@ -582,8 +582,8 @@ export default function Home() {
               <div className="mt-6 space-y-3 text-muted">
                 <p>
                   Email:{" "}
-                  <a href="mailto:contact@gotoogreen.com" className="text-emerald-500">
-                    contact@gotoogreen.com
+                  <a href="mailto:contact@gotoogreen.tn" className="text-emerald-500">
+                    contact@gotoogreen.tn
                   </a>
                 </p>
                 <p>
